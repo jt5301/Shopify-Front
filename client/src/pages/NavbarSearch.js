@@ -10,7 +10,10 @@ const useStyles = makeStyles((theme) => ({
   navContainer: {
     display: 'flex',
     justifyContent: 'space-between',
-    backgroundColor:theme.palette.primary.main
+    backgroundColor:theme.palette.primary.main,
+    position:'fixed',
+    width:'100%',
+    boxShadow: '1px 5px 17px grey'
   },
   root: {
     border: '1px solid #e2e2e1',
@@ -19,7 +22,8 @@ const useStyles = makeStyles((theme) => ({
   },
   name: {
     marginTop: '18px',
-    color:'white'
+    color:'white',
+    fontWeight:'bold',
   }
 
 }))
@@ -37,7 +41,7 @@ const NavbarSearch = () => {
     <AppBar position="relative">
       <Toolbar className={classes.navContainer} >
         <Typography className={classes.name} component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
-          YearOne Movie Rating
+          The Shoppies
       </Typography>
         <Typography variant="h6" color="inherit" noWrap>
           <form onSubmit={(event) => { submitSearch(event) }}>

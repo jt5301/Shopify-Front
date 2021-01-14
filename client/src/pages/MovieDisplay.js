@@ -1,4 +1,4 @@
-import React, {useContext,useState,useEffect} from 'react';
+import React, {useContext} from 'react';
 import {AppBar,CssBaseline,Grid,Typography,Container, CircularProgress} from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles';
 import { SearchContext } from '../hooks/SearchContext'
@@ -9,13 +9,13 @@ import { gql, useQuery} from '@apollo/client';
 
 const useStyles = makeStyles((theme) => ({
   mainContainer:{
-    backgroundColor: theme.palette.primary.main,
+    backgroundColor: theme.palette.primary.light,
   },
   icon: {
     marginRight: theme.spacing(2),
   },
   heroContent: {
-    padding: theme.spacing(8, 0, 6),
+    padding: theme.spacing(15, 0, 6),
     backgroundColor:'white'
   },
   heroButtons: {
@@ -99,7 +99,13 @@ export default function MovieDisplay() {
               Rate a Movie Below
             </Typography>
             <Typography variant="h5" align="center" paragraph>
-              Leave your rating after searching for a movie. You can only vote once per movie!
+              Leave your rating after searching for a movie.
+            </Typography>
+            <Typography variant="h5" align="center" paragraph>
+              Click the "Nominate" button to add it to your list of nominations.
+            </Typography>
+            <Typography variant="h5" align="center" paragraph>
+              You can only nominate five, and you can only vote once on each movie!
             </Typography>
           </Container>
         </div>

@@ -12,7 +12,7 @@
   },
   "scripts": {
     "start": "node ./server/bin/www",
-    "server":"nodemon ./server/bin/www",
+    "server": "nodemon ./server/bin/www",
     "client": "npm start --prefix client",
     "build": "react-scripts build",
     "test": "react-scripts test",

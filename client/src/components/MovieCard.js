@@ -1,9 +1,11 @@
-import React, {useState, useEffect } from 'react'
+import React, {useState, useEffect, useContext } from 'react'
 import { Button,Grid,Card,CardActions,CardActionArea,CardContent,CardMedia,Typography,makeStyles} from '@material-ui/core';
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import ThumbDownIcon from '@material-ui/icons/ThumbDown';
 import {MoreInfoDialog} from './MoreInfoDialog'
-import {gql,useMutation, useApolloClient} from '@apollo/client'
+import {gql,useMutation} from '@apollo/client'
+import {NomineeContext} from '../hooks/NomineeContext'
+import Snackbar from '@material-ui/core/Snackbar';
 
 const useStyles = makeStyles((theme)=>({
   cardCounter:{
@@ -65,9 +67,30 @@ const MovieCard = (props) => {
   const [ratingButtons, setRatingButtons] = useState({thumbsUp:false,thumbsDown:false})
   let [thumbsUpCounter,setThumbsUp] = useState(0)
   let [thumbsDownCounter,setThumbsDown] = useState(0)
+  let nominateContext = useContext(NomineeContext)
+  let [nominatedFlag,setNominatedFlag] = useState(false)
+  let [message, setSnackMessage] = useState('')
+  let [openSnack, setOpenSnack] = useState(false)
   const [addMovie] = useMutation(ADD_MOVIE)
   const [modifyRating]=useMutation(MODIFY_RATING)
 
+  function handleSnackClose(){
+    setOpenSnack(false)
+  }
+  function addMovieToNominees(){
+    if(nominatedFlag){
+      setOpenSnack(true)
+      setSnackMessage("You've already nominated this movie.")
+      return}
+    if(nominateContext.nominees.length===5){
+      setOpenSnack(true)
+      setSnackMessage("There is a limit of five movies to nominate. Remove one from your list first to nominate another")
+    }
+    nominateContext.setNominees([...nominateContext.nominees,props.movie.id])
+    setNominatedFlag(true)
+  }
+  useEffect(()=>{
+  },[nominateContext.nominees])
   useEffect(()=>{
     if(props.movie.mdbCheck){
       setThumbsUp(props.movie.ThumbsUp)
@@ -157,10 +180,14 @@ const MovieCard = (props) => {
                     <Button className = {classes.cardButtons} size="small" color="primary" onClick = {handleOpenDialog}>
                       More Info
                     </Button>
-                    <MoreInfoDialog details = {props.movie} open={open} handleClose={handleClose} />
+                    <Button onClick = {()=>{addMovieToNominees()}} className = {classes.cardButtons} size="small" color="primary">
+                      Nominate
+                    </Button>
                     <Button onClick = {()=>{handleRating('down')}} className = {classes.cardButtons} size="small" color="primary">
                       <ThumbDownIcon/>
                     </Button>
+                    <MoreInfoDialog details = {props.movie} open={open} handleClose={handleClose} />
+
                   </CardActions>
                 </Card>
               </Grid>

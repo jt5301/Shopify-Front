@@ -6,6 +6,8 @@ import {MoreInfoDialog} from './MoreInfoDialog'
 import {gql,useMutation} from '@apollo/client'
 import {NomineeContext} from '../hooks/NomineeContext'
 import Snackbar from '@material-ui/core/Snackbar';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 
 const useStyles = makeStyles((theme)=>({
   cardCounter:{
@@ -74,17 +76,23 @@ const MovieCard = (props) => {
   const [addMovie] = useMutation(ADD_MOVIE)
   const [modifyRating]=useMutation(MODIFY_RATING)
 
-  function handleSnackClose(){
+  function handleSnackClose(event,reason){
+    if (reason === 'clickaway') {
+      return;
+    }
     setOpenSnack(false)
   }
   function addMovieToNominees(){
     if(nominatedFlag){
+      console.log(openSnack)
       setOpenSnack(true)
       setSnackMessage("You've already nominated this movie.")
-      return}
+      return
+    }
     if(nominateContext.nominees.length===5){
       setOpenSnack(true)
-      setSnackMessage("There is a limit of five movies to nominate. Remove one from your list first to nominate another")
+      setSnackMessage("You can only nominate five! Remove one from your list first.")
+      return
     }
     nominateContext.setNominees([...nominateContext.nominees,props.movie.id])
     setNominatedFlag(true)
@@ -187,9 +195,22 @@ const MovieCard = (props) => {
                       <ThumbDownIcon/>
                     </Button>
                     <MoreInfoDialog details = {props.movie} open={open} handleClose={handleClose} />
-
                   </CardActions>
                 </Card>
+                <Snackbar
+        open={openSnack}
+        autoHideDuration={6000}
+        onClose={handleSnackClose}
+        message={message}
+        action={
+          <React.Fragment>
+            <IconButton size="small" aria-label="close" color="inherit" onClick={handleSnackClose}>
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </React.Fragment>
+        }
+        />
+
               </Grid>
   )
 }

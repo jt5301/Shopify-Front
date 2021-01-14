@@ -23,6 +23,8 @@ const useStyles = makeStyles((theme)=>({
     display: 'flex',
     flexDirection: 'column',
     minHeight: 275,
+    maxWidth:270,
+    backgroundColor:theme.palette.secondary.pale
   },
   cardMedia: {
     paddingTop: '100%', // 16:9
@@ -65,17 +67,20 @@ const MODIFY_RATING = gql`
 `
 
 const MovieCard = (props) => {
-  const [open,setOpen] = useState(false)
+  const [openInfo,setOpenInfo] = useState(false)
   const [ratingButtons, setRatingButtons] = useState({thumbsUp:false,thumbsDown:false})
   let [thumbsUpCounter,setThumbsUp] = useState(0)
   let [thumbsDownCounter,setThumbsDown] = useState(0)
-  let nominateContext = useContext(NomineeContext)
+  const nominateContext = useContext(NomineeContext)
   let [nominatedFlag,setNominatedFlag] = useState(false)
   let [message, setSnackMessage] = useState('')
   let [openSnack, setOpenSnack] = useState(false)
   const [addMovie] = useMutation(ADD_MOVIE)
   const [modifyRating]=useMutation(MODIFY_RATING)
 
+  useEffect(()=>{
+console.log(nominateContext.nominees)
+  },nominateContext.nominees)
   function handleSnackClose(event,reason){
     if (reason === 'clickaway') {
       return;
@@ -84,21 +89,24 @@ const MovieCard = (props) => {
   }
   function addMovieToNominees(){
     if(nominatedFlag){
-      console.log(openSnack)
       setOpenSnack(true)
-      setSnackMessage("You've already nominated this movie.")
+      setSnackMessage(`You've already nominated ${props.movie.Title}.`)
       return
     }
-    if(nominateContext.nominees.length===5){
+    if(Object.keys(nominateContext.nominees).length===5){
       setOpenSnack(true)
-      setSnackMessage("You can only nominate five! Remove one from your list first.")
+      setSnackMessage("You can only nominate five movies. Remove one from your list first.")
       return
     }
-    nominateContext.setNominees([...nominateContext.nominees,props.movie.id])
+    nominateContext.setNominees({...nominateContext.nominees,[props.movie.id]: {
+      title:props.movie.Title,
+      poster:props.movie.Poster
+      }
+    })
+    setSnackMessage(`Added ${props.movie.Title} to your list!`)
+    setOpenSnack(true)
     setNominatedFlag(true)
   }
-  useEffect(()=>{
-  },[nominateContext.nominees])
   useEffect(()=>{
     if(props.movie.mdbCheck){
       setThumbsUp(props.movie.ThumbsUp)
@@ -150,11 +158,12 @@ const MovieCard = (props) => {
   }
 
   function handleOpenDialog(){
-    setOpen(true)
+    setOpenInfo(true)
   }
   const handleClose = () => {
-    setOpen(false);
+    setOpenInfo(false);
   };
+
   const classes = useStyles();
   return (
               <Grid item md={4}>
@@ -166,7 +175,6 @@ const MovieCard = (props) => {
                     title="Image title"
                   />
                 </CardActionArea>
-
                   <CardContent className={classes.cardContent}>
                     <Typography className = {classes.title} gutterBottom variant="h5" component="h2">
                       {props.movie.Title}
@@ -194,7 +202,7 @@ const MovieCard = (props) => {
                     <Button onClick = {()=>{handleRating('down')}} className = {classes.cardButtons} size="small" color="primary">
                       <ThumbDownIcon/>
                     </Button>
-                    <MoreInfoDialog details = {props.movie} open={open} handleClose={handleClose} />
+                    <MoreInfoDialog details = {props.movie} open={openInfo} handleClose={handleClose} />
                   </CardActions>
                 </Card>
                 <Snackbar

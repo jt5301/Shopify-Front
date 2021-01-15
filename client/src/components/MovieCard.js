@@ -79,8 +79,10 @@ const MovieCard = (props) => {
   const [modifyRating]=useMutation(MODIFY_RATING)
 
   useEffect(()=>{
-console.log(nominateContext.nominees)
-  },nominateContext.nominees)
+    if(!nominateContext.nominees[props.movie.id]){
+      setNominatedFlag(false)
+    }
+  },[nominateContext])
   function handleSnackClose(event,reason){
     if (reason === 'clickaway') {
       return;
@@ -202,7 +204,6 @@ console.log(nominateContext.nominees)
                     <Button onClick = {()=>{handleRating('down')}} className = {classes.cardButtons} size="small" color="primary">
                       <ThumbDownIcon/>
                     </Button>
-                    <MoreInfoDialog details = {props.movie} open={openInfo} handleClose={handleClose} />
                   </CardActions>
                 </Card>
                 <Snackbar
@@ -218,7 +219,7 @@ console.log(nominateContext.nominees)
           </React.Fragment>
         }
         />
-
+                  <MoreInfoDialog details = {props.movie} open={openInfo} handleClose={handleClose} />
               </Grid>
   )
 }

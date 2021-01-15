@@ -1,14 +1,8 @@
-import React, {useEffect, useContext} from 'react'
+import React, {useEffect,useState, useContext} from 'react'
 import { Button,DialogTitle,Dialog,DialogContent,DialogContentText,DialogActions,makeStyles} from '@material-ui/core';
 import {NomineeContext} from '../hooks/NomineeContext'
 
 const useStyles = makeStyles((theme)=>({
-  dialogBox:{
-    "&.MuiPaper-root": {
-      width:'75%',
-      height:'75%',
-    },
-  },
   posterContainer:{
     "&.MuiDialogContent-root":{
       height:'100%'
@@ -22,38 +16,44 @@ const useStyles = makeStyles((theme)=>({
       fontSize:'x-Large'
     },
     textAlign:'center',
-    textDecoration: 'underline'
+    textDecoration: 'underline',
+    'fontSize':'x-large'
   },
-  extraInfoItem:{
+  nomineeContainer:{
     display:'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    fontWeight:'bold',
-    marginBottom:'2%',
-    fontSize:'small',
-    marginLeft:'5%'
+    'alignItems':'flex-start'
   },
-  description:{
-    fontWeight:'bold',
-    fontSize:'small',
+  poster:{
+    'maxWidth':'100%',
+    // 'maxHeight':'250px',
+    'height':'auto',
+    'width':'auto',
   },
-  extraInfo:{
-    marginBottom:'3%',
-    display:'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent:'center'
+  nominee:{
+    'maxWidth':'fit-content',
+    'display':'flex',
+    'flexDirection':'column',
+    "&.MuiDialogContent-root:first-child":{
+      'paddingTop':'8px'
+    }
   },
-  extraInfoText:{
-    textAlign:'center',
-    fontWeight:'normal'
+  nomineeTitle:{
+    'textAlign':'center',
+    'fontSize':'med'
   },
-  imdbLink:{
-    textDecoration:'none',
-    color:theme.palette.secondary.main
+  buttonContainer:{
+    'display': 'flex',
+    'justifyContent': 'center'
   },
-
-
+  removeButton:{
+    'backgroundColor':theme.palette.primary.dark,
+    'color':'white'
+  },
+  nomineeActions:{
+    'backgroundColor':theme.palette.secondary.pale,
+    'paddingBottom':'24px',
+    height:'150px'
+  }
 }
 ))
 
@@ -63,53 +63,65 @@ export const NomineeList = (props) => {
     function onClose(){
       props.handleClose()
     }
+    const [instructions,setInstructions] = useState(true)
+
+    function removeNominee(event,movie){
+      nominateContext.setNominees({...nominateContext.nominees,[movie]:""})
+    }
+
     useEffect(()=>{
-      console.log('here',nominateContext.nominees)
+      for(let nominee in nominateContext.nominees){
+        if(nominateContext.nominees[nominee]){
+          setInstructions(false)
+          return
+        }
+        setInstructions(true)
+      }
     },[nominateContext.nominees])
+
+
     return(
-      <div>
         <Dialog
           open={props.open}
           onClose={onClose}
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
-          className = {classes.dialogBox}
+          className = {classes.root}
+          fullWidth = {true}
+          maxWidth = 'xl'
         >
+        {instructions ?
+
+          <DialogTitle className = {classes.dialogTitle} id="alert-dialog-title">No movies! You can nominate up to five, and they'll be displayed here.</DialogTitle>
+
+        :
+        <>
         <DialogTitle className = {classes.dialogTitle} id="alert-dialog-title">Your Nominated Movies</DialogTitle>
+          <DialogContent className = {classes.nomineeContainer}>
+            {Object.keys(nominateContext.nominees).map((movie)=>{
+              return(
+                nominateContext.nominees[movie] ?
+                <DialogContent key = {movie} className = {classes.nominee}>
+                    <img className = {classes.poster} alt = {`poster for ${nominateContext.nominees[movie].poster}`} src = {nominateContext.nominees[movie].poster}/>
+                    <DialogContent className = {classes.nomineeActions}>
+                      <DialogContentText className = {classes.nomineeTitle}>{nominateContext.nominees[movie].title}</DialogContentText>
+                      <DialogActions className = {classes.buttonContainer}>
+                        <Button onClick = {(event)=>{removeNominee(event,movie)}} className = {classes.removeButton}>Remove</Button>
+                      </DialogActions>
 
-        <DialogContent>TESTESTEST</DialogContent>
-          {/* <DialogTitle className = {classes.dialogTitle} id="alert-dialog-title">{props.details.Title}</DialogTitle>
-          <DialogContent className = {classes.contentContainer}>
-          <div id = 'movieInfo' className = {classes.posterContainer}>
-            <img alt = {`poster for ${props.details.Title}`} src = {props.details.Poster}/>
-            <div className = {classes.extraInfo}>
-              <div className = {classes.extraInfoItem}>Date Released: <div className = {classes.extraInfoText}>{props.details.Year}</div>
-              </div>
-              <div className = {classes.extraInfoItem}>Director(s): <div className = {classes.extraInfoText}>{props.details.Director} </div>
-              </div>
-              <div className = {classes.extraInfoItem}>Writer(s): <div className = {classes.extraInfoText}>{props.details.Writer}  </div>
-              </div>
-              <div className = {classes.extraInfoItem}>Cast: <div className = {classes.extraInfoText}>{props.details.Actors}</div></div>
-            </div>
-          </div>
+                    </DialogContent>
+                </DialogContent>
+                :
+                ""
+              )
+            })}
+          </DialogContent>
+          </>
+        }
 
-          </DialogContent>
-          <DialogContent>
-          <div className = {classes.description}>Description:</div>
-          <DialogContentText id="alert-dialog-description">
-              {props.details.Plot}
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions className = {classes.dialogButtons}>
-            <Button autoFocus onClick={props.onClose}>
-            <a className = {classes.imdbLink} href = {`https://www.imdb.com/title/${props.details.id}/`}>IMDB Page</a>
-            </Button>
-            <Button onClick={onClose} color="secondary" autoFocus>
-              Close
-            </Button>
-          </DialogActions> */}
+
+
         </Dialog>
-      </div>
 
   )
 }

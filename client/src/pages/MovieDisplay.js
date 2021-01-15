@@ -85,7 +85,6 @@ export default function MovieDisplay() {
   const { loading, data } = useQuery(GETMOVIES,{
     variables:{searchterm:searchTerm.movieKeyword || 'twilight'}
   })
-  console.log(data)
   const classes = useStyles();
   return (
     <React.Fragment>
